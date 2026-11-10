@@ -7,7 +7,7 @@ export class Policy {
   type: InsuranceType;
   holder: User;
   agent: User;
-  cars: Car[] = [];
+  cars: Car[];
   coverageInCents: number;
   issuedAt: Date;
   expiresAt: Date;
