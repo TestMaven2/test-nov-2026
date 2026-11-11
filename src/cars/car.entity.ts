@@ -1,4 +1,4 @@
-import { User } from '../users/user.entity.js';
+import { User } from '../users/user.entity';
 
 export class Car {
   id: number;

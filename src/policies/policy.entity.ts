@@ -1,6 +1,6 @@
-import { InsuranceType } from './enums/insurance-type.enum.js';
-import { User } from '../users/user.entity.js';
-import { Car } from '../cars/car.entity.js';
+import { InsuranceType } from './enums/insurance-type.enum';
+import { User } from '../users/user.entity';
+import { Car } from '../cars/car.entity';
 
 export class Policy {
   id: number;
