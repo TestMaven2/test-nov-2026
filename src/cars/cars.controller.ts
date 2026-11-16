@@ -11,43 +11,55 @@ import {
   Post,
 } from '@nestjs/common';
 import { Car } from './car.entity';
+import { CarsService } from './cars.service';
 
 @Controller('cars')
 export class CarsController {
+  constructor(private readonly service: CarsService) {}
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() car: Car): Car {
-    return new Car();
+  async create(@Body() car: Car): Promise<Car> {
+    return await this.service.create(car);
   }
 
   @Get()
-  getAll(): Car[] {
-    return [];
+  async getAll(): Promise<Car[]> {
+    return await this.service.getAllActiveCars();
   }
 
   @Get(':id')
-  getById(@Param('id', ParseIntPipe) id: number): Car {
-    return new Car();
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<Car> {
+    return await this.service.getActiveCarById(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  update(@Param('id', ParseIntPipe) id: number, @Body() car: Car): void {
-    console.log();
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() car: Car,
+  ): Promise<void> {
+    await this.service.update(id, car);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteById(@Param('id', ParseIntPipe) id: number): void {
-    console.log();
+  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.deleteById(id);
+  }
+
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 
   @Patch(':carId/set-owner/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  setOwner(
+  async setOwner(
     @Param('carId', ParseIntPipe) carId: number,
     @Param('userId', ParseIntPipe) userId: number,
-  ): void {
-    console.log();
+  ): Promise<void> {
+    await this.service.setActiveOwnerToActiveCar(carId, userId);
   }
 }

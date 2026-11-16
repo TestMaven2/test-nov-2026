@@ -12,57 +12,63 @@ import {
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRole } from './enums/user-role.enum';
+import { UsersService } from './users.service';
 
 // http://10.20.30.40:3000/users
 @Controller('users')
 export class UsersController {
+  constructor(private readonly service: UsersService) {}
+
   // CRUD - Create, Read, Update, Delete
 
   // POST -> http://10.20.30.40:3000/users (в теле ожидаем данные юзера)
   @Post()
-  create(@Body() user: User): User {
-    // TODO здесь будет обращение к сервису
-    return new User();
+  async create(@Body() user: User): Promise<User> {
+    return this.service.create(user);
   }
 
   // GET -> http://10.20.30.40:3000/users
   @Get()
-  getAll(): User[] {
-    // TODO здесь будет обращение к сервису
-    return [];
+  async getAll(): Promise<User[]> {
+    return this.service.getAllActiveUsers();
   }
 
   // GET -> http://10.20.30.40:3000/users/7
   @Get(':id')
-  getById(@Param('id', ParseIntPipe) id: number): User {
-    // TODO здесь будет обращение к сервису
-    return new User();
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.service.getActiveUserById(id);
   }
 
   // PATCH -> http://10.20.30.40:3000/users/7 (в теле ожидаем изменяемые данные юзера)
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  update(@Param('id', ParseIntPipe) id: number, @Body() user: User): void {
-    // TODO здесь будет обращение к сервису
-    console.log();
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: User,
+  ): Promise<void> {
+    await this.service.update(id, user);
   }
 
   // DELETE -> http://10.20.30.40:3000/users/7
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteById(@Param('id', ParseIntPipe) id: number): void {
-    // TODO здесь будет обращение к сервису
-    console.log();
+  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.deleteById(id);
+  }
+
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 
   // PATCH -> http://10.20.30.40:3000/users/5/set-role/ADMIN
   @Patch(':id/set-role/:role')
   @HttpCode(HttpStatus.NO_CONTENT)
-  setRole(
+  async setRole(
     @Param('id', ParseIntPipe) id: number,
     @Param('role', new ParseEnumPipe(UserRole)) role: UserRole,
-  ): void {
-    // TODO здесь будет обращение к сервису
-    console.log();
+  ): Promise<void> {
+    await this.service.setRole(id, role);
   }
 }
