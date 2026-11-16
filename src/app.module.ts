@@ -15,7 +15,7 @@ import { PoliciesModule } from './policies/policies.module';
       port: 5432,
       username: 'postgres',
       password: 'qwerty123',
-      database: 'g_89_insurance_test',
+      database: 'g_89_insurance_company',
       autoLoadEntities: true,
       synchronize: true,
     }),

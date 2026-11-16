@@ -17,38 +17,29 @@ export class CarsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() car: Car): Car {
-    console.log('Saved car:', car);
-    return car;
+    return new Car();
   }
 
   @Get()
   getAll(): Car[] {
-    const car1: Car = new Car();
-    car1.brand = 'Toyota';
-    const car2: Car = new Car();
-    car2.brand = 'Nissan';
-    return [car1, car2];
+    return [];
   }
 
   @Get(':id')
   getById(@Param('id', ParseIntPipe) id: number): Car {
-    console.log('Id:', id);
-    const car: Car = new Car();
-    car.brand = 'Honda';
-    return car;
+    return new Car();
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   update(@Param('id', ParseIntPipe) id: number, @Body() car: Car): void {
-    console.log('Id:', id);
-    console.log('New color:', car.color);
+    console.log();
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteById(@Param('id', ParseIntPipe) id: number): void {
-    console.log('Deleted id:', id);
+    console.log();
   }
 
   @Patch(':carId/set-owner/:userId')
@@ -57,7 +48,6 @@ export class CarsController {
     @Param('carId', ParseIntPipe) carId: number,
     @Param('userId', ParseIntPipe) userId: number,
   ): void {
-    console.log('Car id:', carId);
-    console.log('Owner id:', userId);
+    console.log();
   }
 }

@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('policies')
 export class Policy {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -19,19 +19,19 @@ export class Policy {
   @Column({ name: 'type', nullable: false, type: 'enum', enum: InsuranceType })
   type: InsuranceType;
 
-  @ManyToOne((): typeof User => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false })
   @JoinColumn({
     name: 'holder_id',
   })
   holder: User;
 
-  @ManyToOne((): typeof User => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false })
   @JoinColumn({
     name: 'agent_id',
   })
   agent: User;
 
-  @ManyToMany((): typeof Car => Car)
+  @ManyToMany(() => Car)
   @JoinTable({
     name: 'policies_cars',
     joinColumn: { name: 'policy_id', referencedColumnName: 'id' },
