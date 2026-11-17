@@ -10,8 +10,11 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { Car } from './car.entity';
 import { CarsService } from './cars.service';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { CarDto } from './dto/car.dto';
+import { CarSaveDto } from './dto/car.save-dto';
+import { CarUpdateDto } from './dto/car.update-dto';
 
 @Controller('cars')
 export class CarsController {
@@ -19,17 +22,27 @@ export class CarsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() car: Car): Promise<Car> {
-    return await this.service.create(car);
+  @ApiOkResponse({
+    type: CarDto,
+  })
+  async create(@Body() saveDto: CarSaveDto): Promise<CarDto> {
+    return await this.service.create(saveDto);
   }
 
   @Get()
-  async getAll(): Promise<Car[]> {
+  @ApiOkResponse({
+    type: CarDto,
+    isArray: true,
+  })
+  async getAll(): Promise<CarDto[]> {
     return await this.service.getAllActiveCars();
   }
 
   @Get(':id')
-  async getById(@Param('id', ParseIntPipe) id: number): Promise<Car> {
+  @ApiOkResponse({
+    type: CarDto,
+  })
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<CarDto | null> {
     return await this.service.getActiveCarById(id);
   }
 
@@ -37,9 +50,9 @@ export class CarsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() car: Car,
+    @Body() updateDto: CarUpdateDto,
   ): Promise<void> {
-    await this.service.update(id, car);
+    await this.service.update(id, updateDto);
   }
 
   @Delete(':id')

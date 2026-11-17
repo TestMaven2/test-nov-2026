@@ -2,22 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './user.entity';
 import { UserRole } from './enums/user-role.enum';
+import { UserDto } from './dto/user.dto';
+import { UsersMapper } from './dto/users.mapper';
+import { UserSaveDto } from './dto/user.save-dto';
+import { UserUpdateDto } from './dto/user.update-dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly repository: UsersRepository) {}
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly mapper: UsersMapper,
+  ) {}
 
-  async create(user: User): Promise<User> {
-    user.role = UserRole.CUSTOMER;
-    user.active = true;
-    return this.repository.save(user);
+  async create(saveDto: UserSaveDto): Promise<UserDto> {
+    const entity: User = this.mapper.mapDtoToEntity(saveDto);
+    entity.role = UserRole.CUSTOMER;
+    entity.active = true;
+    await this.repository.save(entity);
+    return this.mapper.mapEntityToDto(entity);
   }
 
-  async getAllActiveUsers(): Promise<User[]> {
-    return this.repository.findAllActive();
+  async getAllActiveUsers(): Promise<UserDto[]> {
+    const users: User[] = await this.repository.findAllActive();
+    return this.mapper.mapEntityListToDtoList(users);
   }
 
-  async getActiveUserById(id: number): Promise<User> {
+  async getActiveUserById(id: number): Promise<UserDto> {
+    const user: User = await this.getActiveEntityById(id);
+    return this.mapper.mapEntityToDto(user);
+  }
+
+  async getActiveEntityById(id: number): Promise<User> {
     const user: User | null = await this.repository.findById(id);
 
     if (!user || !user.active) {
@@ -27,32 +42,32 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, user: User): Promise<void> {
+  async update(id: number, updateDto: UserUpdateDto): Promise<void> {
     const foundUser: User | null = await this.repository.findById(id);
 
     if (foundUser) {
-      foundUser.name = user.name;
+      foundUser.name = updateDto.newName;
       await this.repository.save(foundUser);
     }
   }
 
   async deleteById(id: number): Promise<void> {
-    const user: User = await this.getActiveUserById(id);
+    const user: User = await this.getActiveEntityById(id);
     user.active = false;
     await this.repository.save(user);
   }
 
   async restoreById(id: number): Promise<void> {
-    const foundUser: User | null = await this.repository.findById(id);
+    const user: User | null = await this.repository.findById(id);
 
-    if (foundUser && !foundUser.active) {
-      foundUser.active = true;
-      await this.repository.save(foundUser);
+    if (user && !user.active) {
+      user.active = true;
+      await this.repository.save(user);
     }
   }
 
   async setRole(id: number, role: UserRole): Promise<void> {
-    const user: User = await this.getActiveUserById(id);
+    const user: User = await this.getActiveEntityById(id);
     user.role = role;
     await this.repository.save(user);
   }

@@ -5,64 +5,75 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param, ParseEnumPipe,
+  Param,
+  ParseEnumPipe,
   ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
-import { User } from './user.entity';
 import { UserRole } from './enums/user-role.enum';
 import { UsersService } from './users.service';
+import { UserDto } from './dto/user.dto';
+import { UserSaveDto } from './dto/user.save-dto';
+import { UserUpdateDto } from './dto/user.update-dto';
+import { ApiOkResponse } from '@nestjs/swagger';
 
-// http://10.20.30.40:3000/users
+// localhost:3000/users
 @Controller('users')
 export class UsersController {
   constructor(private readonly service: UsersService) {}
 
-  // CRUD - Create, Read, Update, Delete
-
-  // POST -> http://10.20.30.40:3000/users (в теле ожидаем данные юзера)
+  // CRUD - Create Read Update Delete
   @Post()
-  async create(@Body() user: User): Promise<User> {
-    return this.service.create(user);
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOkResponse({
+    type: UserDto,
+  })
+  async create(@Body() saveDto: UserSaveDto): Promise<UserDto> {
+    return this.service.create(saveDto);
   }
 
-  // GET -> http://10.20.30.40:3000/users
   @Get()
-  async getAll(): Promise<User[]> {
+  @ApiOkResponse({
+    type: UserDto,
+    isArray: true,
+  })
+  async getAll(): Promise<UserDto[]> {
     return this.service.getAllActiveUsers();
   }
 
-  // GET -> http://10.20.30.40:3000/users/7
+  // GET 10.20.30.40:3000/users?id=7 -> '7'
+  // GET 10.20.30.40:3000/users/7 - предпочтительный подход для id
   @Get(':id')
-  async getById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  @ApiOkResponse({
+    type: UserDto,
+  })
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
     return this.service.getActiveUserById(id);
   }
 
-  // PATCH -> http://10.20.30.40:3000/users/7 (в теле ожидаем изменяемые данные юзера)
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() user: User,
+    @Body() updateDto: UserUpdateDto,
   ): Promise<void> {
-    await this.service.update(id, user);
+    await this.service.update(id, updateDto);
   }
 
-  // DELETE -> http://10.20.30.40:3000/users/7
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
   }
 
-  @Patch(':id/restore')
+  @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.restoreById(id);
   }
 
-  // PATCH -> http://10.20.30.40:3000/users/5/set-role/ADMIN
+  // PATCH 10.20.30.40:3000/users/5/set-role/ADMIN
   @Patch(':id/set-role/:role')
   @HttpCode(HttpStatus.NO_CONTENT)
   async setRole(
