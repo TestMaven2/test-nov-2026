@@ -6,6 +6,9 @@ import { UserDto } from './dto/user.dto';
 import { UsersMapper } from './dto/users.mapper';
 import { UserSaveDto } from './dto/user-save.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { EntitySaveException } from '../exceptions/types/entity-save.exception';
+import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
+import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +18,10 @@ export class UsersService {
   ) {}
 
   async create(saveDto: UserSaveDto): Promise<UserDto> {
+    if (await this.repository.isEmailExists(saveDto.email)) {
+      throw new EntitySaveException(User.name, 'email');
+    }
+
     const entity: User = this.mapper.mapDtoToEntity(saveDto);
     entity.role = UserRole.CUSTOMER;
     entity.active = true;
@@ -36,7 +43,7 @@ export class UsersService {
     const user: User | null = await this.repository.findById(id);
 
     if (!user || !user.active) {
-      throw Error();
+      throw new EntityNotFoundException(User.name, id);
     }
 
     return user;
@@ -48,6 +55,8 @@ export class UsersService {
     if (foundUser) {
       foundUser.name = updateDto.newName;
       await this.repository.save(foundUser);
+    } else {
+      throw new EntityNotFoundException(User.name, id);
     }
   }
 
@@ -60,7 +69,11 @@ export class UsersService {
   async restoreById(id: number): Promise<void> {
     const user: User | null = await this.repository.findById(id);
 
-    if (user && !user.active) {
+    if (!user) {
+      throw new EntityNotFoundException(User.name, id);
+    }
+
+    if (!user.active) {
       user.active = true;
       await this.repository.save(user);
     }
@@ -68,6 +81,11 @@ export class UsersService {
 
   async setRole(id: number, role: UserRole): Promise<void> {
     const user: User = await this.getActiveEntityById(id);
+
+    if (user.role === role) {
+      throw new EntityUpdateException(`User id ${id} already has role ${role}`);
+    }
+
     user.role = role;
     await this.repository.save(user);
   }

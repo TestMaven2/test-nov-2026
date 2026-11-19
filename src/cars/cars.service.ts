@@ -6,6 +6,10 @@ import { CarsMapper } from './dto/cars.mapper';
 import { CarSaveDto } from './dto/car-save.dto';
 import { CarDto } from './dto/car.dto';
 import { CarUpdateDto } from './dto/car-update.dto';
+import { EntitySaveException } from '../exceptions/types/entity-save.exception';
+import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
+import { User } from '../users/user.entity';
+import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
 
 @Injectable()
 export class CarsService {
@@ -16,6 +20,10 @@ export class CarsService {
   ) {}
 
   async create(saveDto: CarSaveDto): Promise<CarDto> {
+    if (await this.repository.isVinExists(saveDto.vin)) {
+      throw new EntitySaveException(Car.name, 'vin');
+    }
+
     const entity: Car = this.mapper.mapDtoToEntity(saveDto);
     entity.active = true;
     await this.repository.save(entity);
@@ -36,7 +44,7 @@ export class CarsService {
     const car: Car | null = await this.repository.findById(id);
 
     if (!car || !car.active) {
-      throw Error();
+      throw new EntityNotFoundException(Car.name, id);
     }
 
     return car;
@@ -57,7 +65,11 @@ export class CarsService {
   async restoreById(id: number): Promise<void> {
     const car: Car | null = await this.repository.findById(id);
 
-    if (car && !car.active) {
+    if (!car) {
+      throw new EntityNotFoundException(Car.name, id);
+    }
+
+    if (!car.active) {
       car.active = true;
       await this.repository.save(car);
     }
@@ -68,7 +80,15 @@ export class CarsService {
     ownerId: number,
   ): Promise<void> {
     const car: Car = await this.getActiveEntityById(carId);
-    car.owner = await this.userService.getActiveEntityById(ownerId);
+    const owner: User = await this.userService.getActiveEntityById(ownerId);
+
+    if (car.owner.id === owner.id) {
+      throw new EntityUpdateException(
+        `User id ${ownerId} is already owner of the car id ${carId}`,
+      );
+    }
+
+    car.owner = owner;
     await this.repository.save(car);
   }
 }
