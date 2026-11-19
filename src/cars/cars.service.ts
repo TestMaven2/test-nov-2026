@@ -3,9 +3,9 @@ import { Car } from './car.entity';
 import { CarsRepository } from './cars.repository';
 import { UsersService } from '../users/users.service';
 import { CarsMapper } from './dto/cars.mapper';
-import { CarSaveDto } from './dto/car.save-dto';
+import { CarSaveDto } from './dto/car-save.dto';
 import { CarDto } from './dto/car.dto';
-import { CarUpdateDto } from './dto/car.update-dto';
+import { CarUpdateDto } from './dto/car-update.dto';
 
 @Injectable()
 export class CarsService {

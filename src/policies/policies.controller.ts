@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { PoliciesService } from './policies.service';
-import { PolicySaveDto } from './dto/policy.save-dto';
+import { PolicySaveDto } from './dto/policy-save.dto';
 import { PolicyDto } from './dto/policy.dto';
 
 @Controller('policies')

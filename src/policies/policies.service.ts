@@ -3,7 +3,7 @@ import { PoliciesRepository } from './policies.repository';
 import { Policy } from './policy.entity';
 import { Car } from '../cars/car.entity';
 import { CarsService } from '../cars/cars.service';
-import { PolicySaveDto } from './dto/policy.save-dto';
+import { PolicySaveDto } from './dto/policy-save.dto';
 import { PolicyDto } from './dto/policy.dto';
 import { UsersService } from '../users/users.service';
 import { PoliciesMapper } from './dto/policies.mapper';

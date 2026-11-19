@@ -4,8 +4,8 @@ import { User } from './user.entity';
 import { UserRole } from './enums/user-role.enum';
 import { UserDto } from './dto/user.dto';
 import { UsersMapper } from './dto/users.mapper';
-import { UserSaveDto } from './dto/user.save-dto';
-import { UserUpdateDto } from './dto/user.update-dto';
+import { UserSaveDto } from './dto/user-save.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
 
 @Injectable()
 export class UsersService {

@@ -3,7 +3,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { PolicySaveDto } from '../dto/policy.save-dto';
+import { PolicySaveDto } from '../dto/policy-save.dto';
 
 @ValidatorConstraint({
   name: 'areDatesValid',

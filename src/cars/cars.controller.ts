@@ -13,8 +13,8 @@ import {
 import { CarsService } from './cars.service';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { CarDto } from './dto/car.dto';
-import { CarSaveDto } from './dto/car.save-dto';
-import { CarUpdateDto } from './dto/car.update-dto';
+import { CarSaveDto } from './dto/car-save.dto';
+import { CarUpdateDto } from './dto/car-update.dto';
 
 @Controller('cars')
 export class CarsController {
