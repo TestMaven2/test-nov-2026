@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Car } from './car.entity';
 import { CarsRepository } from './cars.repository';
 import { UsersService } from '../users/users.service';
@@ -13,6 +13,8 @@ import { EntityUpdateException } from '../exceptions/types/entity-update.excepti
 
 @Injectable()
 export class CarsService {
+  private readonly logger: Logger = new Logger(CarsService.name);
+
   constructor(
     private readonly repository: CarsRepository,
     private readonly userService: UsersService,
@@ -27,6 +29,9 @@ export class CarsService {
     const entity: Car = this.mapper.mapDtoToEntity(saveDto);
     entity.active = true;
     await this.repository.save(entity);
+
+    this.logger.log(`Car created: id ${entity.id}, VIN ${entity.vin}`);
+
     return this.mapper.mapEntityToDto(entity);
   }
 
@@ -54,12 +59,16 @@ export class CarsService {
     const foundCar: Car = await this.getActiveEntityById(id);
     foundCar.color = updateDto.newColor;
     await this.repository.save(foundCar);
+
+    this.logger.log(`Car updated: id ${id}, new color ${foundCar.color}`);
   }
 
   async deleteById(id: number): Promise<void> {
     const car: Car = await this.getActiveEntityById(id);
     car.active = false;
     await this.repository.save(car);
+
+    this.logger.log(`Car marked as inactive: id ${id}`);
   }
 
   async restoreById(id: number): Promise<void> {
@@ -72,6 +81,8 @@ export class CarsService {
     if (!car.active) {
       car.active = true;
       await this.repository.save(car);
+
+      this.logger.log(`Car marked as active: id ${id}`);
     }
   }
 
@@ -90,5 +101,7 @@ export class CarsService {
 
     car.owner = owner;
     await this.repository.save(car);
+
+    this.logger.log(`Car updated: id ${carId}, new owner id ${ownerId}`);
   }
 }
