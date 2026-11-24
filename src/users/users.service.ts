@@ -100,6 +100,6 @@ export class UsersService {
     user.role = role;
     await this.repository.save(user);
 
-    this.logger.log(`User updated: ${id}, new role ${role}`);
+    this.logger.log(`User updated: id ${id}, new role ${role}`);
   }
 }
