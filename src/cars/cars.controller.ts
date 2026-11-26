@@ -15,11 +15,14 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import { CarDto } from './dto/car.dto';
 import { CarSaveDto } from './dto/car-save.dto';
 import { CarUpdateDto } from './dto/car-update.dto';
+import { Roles } from '../auth/types/auth.decorators';
+import { UserRole } from '../users/enums/user-role.enum';
 
 @Controller('cars')
 export class CarsController {
   constructor(private readonly service: CarsService) {}
 
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOkResponse({
@@ -29,6 +32,7 @@ export class CarsController {
     return await this.service.create(saveDto);
   }
 
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @Get()
   @ApiOkResponse({
     type: CarDto,
@@ -38,6 +42,7 @@ export class CarsController {
     return await this.service.getAllActiveCars();
   }
 
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @Get(':id')
   @ApiOkResponse({
     type: CarDto,
@@ -46,6 +51,7 @@ export class CarsController {
     return await this.service.getActiveCarById(id);
   }
 
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
@@ -55,18 +61,21 @@ export class CarsController {
     await this.service.update(id, updateDto);
   }
 
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
   }
 
+  @Roles(UserRole.ADMIN)
   @Patch(':id/restore')
   @HttpCode(HttpStatus.NO_CONTENT)
   async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.restoreById(id);
   }
 
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @Patch(':carId/set-owner/:userId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async setOwner(

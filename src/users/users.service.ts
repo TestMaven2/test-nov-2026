@@ -9,6 +9,8 @@ import { UserUpdateDto } from './dto/user-update.dto';
 import { EntitySaveException } from '../exceptions/types/entity-save.exception';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
+import * as bcrypt from 'bcrypt';
+import { UserIsNotConfirmedException } from '../exceptions/types/user-is-not-confirmed.exception';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +27,7 @@ export class UsersService {
     }
 
     const entity: User = this.mapper.mapDtoToEntity(saveDto);
+    entity.password = await bcrypt.hash(entity.password, 10);
     entity.role = UserRole.CUSTOMER;
     entity.active = true;
     await this.repository.save(entity);
@@ -48,7 +51,7 @@ export class UsersService {
     const user: User | null = await this.repository.findById(id);
 
     if (!user || !user.active) {
-      throw new EntityNotFoundException(User.name, id);
+      throw new EntityNotFoundException(User.name, 'id', id);
     }
 
     return user;
@@ -63,7 +66,7 @@ export class UsersService {
 
       this.logger.log(`User updated: id ${id}, new name ${foundUser.name}`);
     } else {
-      throw new EntityNotFoundException(User.name, id);
+      throw new EntityNotFoundException(User.name, 'id', id);
     }
   }
 
@@ -79,7 +82,7 @@ export class UsersService {
     const user: User | null = await this.repository.findById(id);
 
     if (!user) {
-      throw new EntityNotFoundException(User.name, id);
+      throw new EntityNotFoundException(User.name, 'id', id);
     }
 
     if (!user.active) {
@@ -101,5 +104,19 @@ export class UsersService {
     await this.repository.save(user);
 
     this.logger.log(`User updated: id ${id}, new role ${role}`);
+  }
+
+  async getConfirmedByEmail(email: string): Promise<User> {
+    const user: User | null = await this.repository.findByEmail(email);
+
+    if (!user) {
+      throw new EntityNotFoundException(User.name, 'email', email);
+    }
+
+    if (!user.active) {
+      throw new UserIsNotConfirmedException(email);
+    }
+
+    return user;
   }
 }

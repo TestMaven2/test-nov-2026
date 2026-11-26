@@ -49,7 +49,7 @@ export class CarsService {
     const car: Car | null = await this.repository.findById(id);
 
     if (!car || !car.active) {
-      throw new EntityNotFoundException(Car.name, id);
+      throw new EntityNotFoundException(Car.name, 'id', id);
     }
 
     return car;
@@ -75,7 +75,7 @@ export class CarsService {
     const car: Car | null = await this.repository.findById(id);
 
     if (!car) {
-      throw new EntityNotFoundException(Car.name, id);
+      throw new EntityNotFoundException(Car.name, 'id', id);
     }
 
     if (!car.active) {

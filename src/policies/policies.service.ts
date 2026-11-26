@@ -70,7 +70,7 @@ export class PoliciesService {
     const policy: Policy | null = await this.repository.findById(id);
 
     if (!policy || !policy.active) {
-      throw new EntityNotFoundException(Policy.name, id);
+      throw new EntityNotFoundException(Policy.name, 'id', id);
     }
 
     return policy;
@@ -88,7 +88,7 @@ export class PoliciesService {
     const policy: Policy | null = await this.repository.findById(id);
 
     if (!policy) {
-      throw new EntityNotFoundException(Policy.name, id);
+      throw new EntityNotFoundException(Policy.name, 'id', id);
     }
 
     if (!policy.active) {
